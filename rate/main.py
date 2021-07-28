@@ -388,6 +388,8 @@ if args.mode.lower() == 'train':
         var['N'] = N
         var['exc'] = net.exc
         var['inh'] = net.inh
+        var['inh_som'] = net.som_inh
+        var['inh_pv'] = net.pv_inh
         var['w_in'] = t_w_in
         var['b_out'] = t_b_out
         var['som_N'] = som_N

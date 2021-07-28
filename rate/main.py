@@ -20,6 +20,7 @@ import tensorflow.compat.v1 as tf; tf.disable_eager_execution() # Adaptation to 
 import argparse
 import datetime
 import wandb
+import pickle
 
 # Import utility functions
 from utils import set_gpu
@@ -406,6 +407,9 @@ if args.mode.lower() == 'train':
         elif len(settings['taus']) == 1:
             fname = 'Task_{}_N_{}_Tau_{}_Act_{}_{}.mat'.format(args.task.lower(), N, settings['taus'][0], 
                     training_params['activation'], fname_time)
-        scipy.io.savemat(os.path.join(out_dir, fname), var)
-
-
+        fname = '{}_{}_{}'.format(args.project, args.run, fname)
+        save_path = os.path.join(out_dir, fname)
+        with open(save_path.replace('.mat', '.pkl'), 'wb') as f:
+            pickle.dump(var, f)
+        scipy.io.savemat(save_path, var)
+        print('Trained parameters saved in', save_path)

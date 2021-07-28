@@ -10,10 +10,19 @@ clear; clc;
 % First, load one trained rate RNN
 % Make sure lambda_grid_search.m was performed on the model.
 % Update model_path to point where the trained model is
-model_path = '../models/go-nogo/P_rec_0.2_Taus_4.0_20.0'; 
-mat_file = dir(fullfile(model_path, '*.mat'));
-model_name = mat_file(1).name;
+
+% Specify a mat file with its path.
+model_path = '../rate/outdir/models/go-nogo/P_rec_0.2_Taus_4.0_20.0';
+model_name = 'spikeRNN_Fig-S3-SST-run-01_Task_go-nogo_N_200_Taus_4.0_20.0_Act_sigmoid_2021_07_09_173315.mat';
 model_path = fullfile(model_path, model_name);
+
+% Specify a mat file with its directory path.
+% Use the first mat file in the directory
+% model_path = '.'
+% mat_file = dir(fullfile(model_path, '*.mat'));
+% model_name = mat_file(1).name;
+% model_path = fullfile(model_path, model_name);
+
 load(model_path);
 
 use_initial_weights = false;

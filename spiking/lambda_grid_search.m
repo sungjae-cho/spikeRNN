@@ -26,7 +26,7 @@
 clear; clc;
 
 % Directory containing all the trained rate RNN model .mat files
-model_dir = '../models/go-nogo/P_rec_0.2_Taus_4.0_20.0';
+model_dir = '../rate/outdir/models/go-nogo/P_rec_0.2_Taus_4.0_20.0';
 mat_files = dir(fullfile(model_dir, '*.mat'));
 
 % Whether to use the initial random connectivity weights

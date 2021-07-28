@@ -19,6 +19,7 @@ import tensorflow as tf
 import tensorflow.compat.v1 as tf; tf.disable_eager_execution() # Adaptation to use TF1 code in TF2.
 import argparse
 import datetime
+import wandb
 
 # Import utility functions
 from utils import set_gpu
@@ -43,6 +44,10 @@ from model import loss_op
 
 # Parse input arguments
 parser = argparse.ArgumentParser(description='Training rate RNNs')
+parser.add_argument('--project', required=False,
+        default='0', help="Which gpu to use")
+parser.add_argument('--run', required=False,
+        default='0', help="Which gpu to use")
 parser.add_argument('--gpu', required=False,
         default='0', help="Which gpu to use")
 parser.add_argument("--gpu_frac", required=False,
@@ -79,6 +84,8 @@ parser.add_argument("--decay_taus", required=True,
         help="Synaptic decay time-constants (in time-steps). If only one number is given, then all\
         time-constants set to that value (i.e. not trainable). Otherwise specify two numbers (min, max).")
 args = parser.parse_args()
+
+wandb.init(project=args.project, name=args.run)
 
 # Set up the output dir where the output model will be saved
 out_dir = os.path.join(args.output_dir, 'models', args.task.lower())
@@ -246,6 +253,7 @@ if args.mode.lower() == 'train':
                     sess.run([training_op, loss, w, o, w_out, x, r, m, som_m, w_in, b_out, taus],
                     feed_dict={input_node: u, z: target})
 
+            wandb.log({'loss' : t_loss}, step=tr)
             print('Loss: ', t_loss)
             losses[tr] = t_loss
 
@@ -277,6 +285,10 @@ if args.mode.lower() == 'train':
 
                     eval_perf_mean = np.nanmean(eval_perf, 1)
                     eval_loss_mean = np.nanmean(eval_losses, 1)
+                    wandb.log({
+                        'eval_perf_mean' : eval_perf_mean,
+                        'eval_loss_mean' : eval_loss_mean
+                    }, step=tr)
                     print("Perf: %.2f, Loss: %.2f"%(eval_perf_mean, eval_loss_mean))
 
                     if eval_loss_mean < training_params['loss_threshold'] and eval_perf_mean > 0.95 and tr > 1500:
@@ -309,6 +321,10 @@ if args.mode.lower() == 'train':
 
                     eval_perf_mean = np.nanmean(eval_perf, 1)
                     eval_loss_mean = np.nanmean(eval_losses, 1)
+                    wandb.log({
+                        'eval_perf_mean' : eval_perf_mean,
+                        'eval_loss_mean' : eval_loss_mean
+                    }, step=tr)
                     print("Perf: %.2f, Loss: %.2f"%(eval_perf_mean, eval_loss_mean))
 
                     if eval_loss_mean < training_params['loss_threshold'] and eval_perf_mean > 0.95:
@@ -339,6 +355,10 @@ if args.mode.lower() == 'train':
 
                     eval_perf_mean = np.nanmean(eval_perf, 1)
                     eval_loss_mean = np.nanmean(eval_losses, 1)
+                    wandb.log({
+                        'eval_perf_mean' : eval_perf_mean,
+                        'eval_loss_mean' : eval_loss_mean
+                    }, step=tr)
                     print("Perf: %.2f, Loss: %.2f"%(eval_perf_mean, eval_loss_mean))
 
                     if eval_loss_mean < training_params['loss_threshold'] and eval_perf_mean > 0.95:
@@ -346,7 +366,7 @@ if args.mode.lower() == 'train':
                         break
 
         elapsed_time = time.time() - start_time
-        # print(elapsed_time)
+        print("elapsed_time (sec):", elapsed_time)
 
         # Save the trained params in a .mat file
         var = {}

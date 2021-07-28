@@ -51,9 +51,13 @@ class FR_RNN_dale:
         self.w_out = w_out
 
         # Assign each unit as excitatory or inhibitory
-        inh, exc, NI, NE, som_inh = self.assign_exc_inh()
+        inh, exc, NI, NE, som_inh, pv_inh, som_inh_idx, pv_inh_idx = self.assign_exc_inh()
         self.inh = inh
         self.som_inh = som_inh
+        self.pv_inh = pv_inh
+        self.som_inh_idx = som_inh_idx
+        self.pv_inh_idx = pv_inh_idx
+
         self.exc = exc
         self.NI = NI
         self.NE = NE
@@ -70,7 +74,8 @@ class FR_RNN_dale:
             exc: bool array marking which units are excitatory
             NI: number of inhibitory units
             NE: number of excitatory units
-            som_inh: indices of "inh" for SOM neurons
+            som_inh_idx: indices of "inh" for SOM neurons
+            pv_inh_idx: indices of "inh" for PV neurons
         """
         # Apply Dale's principle
         if self.apply_dale == True:
@@ -87,11 +92,21 @@ class FR_RNN_dale:
             NE = self.N - NI
 
         if self.som_N > 0:
-            som_inh = np.where(inh==True)[0][:self.som_N]
+            som_inh_idx = np.where(inh==True)[0][:self.som_N]
+            pv_inh_idx = np.where(inh==True)[0][self.som_N:]
+            som_inh_mask = np.zeros_like(inh)
+            som_inh_mask[som_inh_idx,:] = 1
+            som_inh = inh * som_inh_mask
+            pv_inh_mask = np.zeros_like(inh)
+            pv_inh_mask[pv_inh_idx,:] = 1
+            pv_inh = inh * pv_inh_mask
         else:
-            som_inh = 0
+            som_inh_idx = 0
+            pv_inh_idx = np.where(inh==True)[0]
+            som_inh = np.zeros_like(inh)
+            pv_inh = np.ones_like(inh)
 
-        return inh, exc, NI, NE, som_inh
+        return inh, exc, NI, NE, som_inh, pv_inh, som_inh_idx, pv_inh_idx
 
     def initialize_W(self):
         """
@@ -124,7 +139,7 @@ class FR_RNN_dale:
         # SOM mask matrix
         som_mask = np.ones((self.N, self.N), dtype=np.float32)
         if self.som_N > 0:
-            for i in self.som_inh:
+            for i in self.som_inh_idx:
                 som_mask[i, np.where(self.inh==True)[0]] = 0
 
         return w, mask, som_mask
@@ -435,7 +450,7 @@ def construct_tf(fr_rnn, settings, training_params):
 
     # Inhibitory units
     inh_idx_tf = tf.constant(np.where(fr_rnn.inh == True)[0], name='inh_idx')
-    som_inh_idx_tf = tf.constant(fr_rnn.som_inh, name='som_inh_idx')
+    som_inh_idx_tf = tf.constant(fr_rnn.som_inh_idx, name='som_inh_idx')
 
     # Input node
     # XOR task

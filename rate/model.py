@@ -10,6 +10,7 @@
 import os, sys
 import numpy as np
 import tensorflow as tf
+import tensorflow.compat.v1 as tf; tf.disable_eager_execution() # Adaptation to use TF1 code in TF2.
 import scipy.io
 
 '''

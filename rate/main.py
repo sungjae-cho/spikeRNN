@@ -16,6 +16,7 @@ import time
 import scipy.io
 import numpy as np
 import tensorflow as tf
+import tensorflow.compat.v1 as tf; tf.disable_eager_execution() # Adaptation to use TF1 code in TF2.
 import argparse
 import datetime
 
@@ -189,7 +190,9 @@ if args.mode.lower() == 'train':
 '''
 Start the TF session and train the network
 '''
-sess = tf.Session(config=tf.ConfigProto(gpu_options=set_gpu(args.gpu, args.gpu_frac)))
+set_gpu(args.gpu, args.gpu_frac)
+sess = tf.Session(config=tf.ConfigProto())
+#sess = tf.Session(config=tf.ConfigProto(gpu_options=set_gpu(args.gpu, args.gpu_frac)))
 init = tf.global_variables_initializer()
 
 if args.mode.lower() == 'train':

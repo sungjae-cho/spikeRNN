@@ -71,8 +71,10 @@ go_spk = spk;   % spikes
 % Plot the network output
 % --------------------------------------------------------------
 figure; axis tight; hold on;
-plot(t, nogo_out, 'm', 'linewidth', 2);
-plot(t, go_out, 'g', 'linewidth', 2);
+title('Output Activity for Go and No-go Stimuli');
+plot(t, nogo_out, 'm', 'linewidth', 2, 'DisplayName', 'No-go');
+plot(t, go_out, 'g', 'linewidth', 2, 'DisplayName', 'Go');
+legend('Location','best');
 
 
 % --------------------------------------------------------------
@@ -82,15 +84,21 @@ plot(t, go_out, 'g', 'linewidth', 2);
 figure('Units', 'Normalized', 'Outerposition', [0 0 0.22 0.20]);
 hold on; axis tight;
 inh_ind = find(inh);
+inh_pv_ind = find(inh_pv);
+inh_som_ind = find(inh_som);
 exc_ind = find(exc);
-all_ind = [exc_ind; inh_ind];
-all_ind = 1:N;
+all_ind = [exc_ind; inh_pv_ind; inh_som_ind];
+% all_ind = [exc_ind; inh_ind];
+% all_ind = 1:N;
+title('Spikes for a No-go Stimulus (PYR:red, PV:blue, SST:orange)');
 for i = 1:length(all_ind)
   curr_spk = nogo_spk(all_ind(i), 10:end);
   if exc(all_ind(i)) == 1
     plot(t(find(curr_spk)), ones(1, length(find(curr_spk)))*i, 'r.', 'markers', 8);
-  else
+  elseif inh_pv(all_ind(i)) == 1
     plot(t(find(curr_spk)), ones(1, length(find(curr_spk)))*i, 'b.', 'markers', 8);
+  else
+    plot(t(find(curr_spk)), ones(1, length(find(curr_spk)))*i, '.', 'color', '#FFA500', 'markers', 8);
   end
 end
 xlim([0, 1]);
@@ -100,18 +108,22 @@ ylim([-5, 205]);
 figure('Units', 'Normalized', 'Outerposition', [0 0 0.22 0.20]);
 hold on; axis tight;
 inh_ind = find(inh);
+inh_pv_ind = find(inh_pv);
+inh_som_ind = find(inh_som);
 exc_ind = find(exc);
-all_ind = [exc_ind; inh_ind];
-all_ind = 1:N;
+all_ind = [exc_ind; inh_pv_ind; inh_som_ind];
+% all_ind = [exc_ind; inh_ind];
+% all_ind = 1:N;
+title('Spikes for a Go Stimulus (PYR:red, PV:blue, SST:orange)');
 for i = 1:length(all_ind)
   curr_spk = go_spk(all_ind(i), 10:end);
   if exc(all_ind(i)) == 1
     plot(t(find(curr_spk)), ones(1, length(find(curr_spk)))*i, 'r.', 'markers', 8);
-  else
+  elseif inh_pv(all_ind(i)) == 1
     plot(t(find(curr_spk)), ones(1, length(find(curr_spk)))*i, 'b.', 'markers', 8);
+  else
+    plot(t(find(curr_spk)), ones(1, length(find(curr_spk)))*i, '.', 'color', '#FFA500', 'markers', 8);
   end
 end
 xlim([0, 1]);
 ylim([-5, 205]);
-
-

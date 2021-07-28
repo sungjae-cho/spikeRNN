@@ -23,8 +23,8 @@ def set_gpu(gpu, frac):
     """
     os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
     os.environ["CUDA_VISIBLE_DEVICES"] = gpu
-    gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=frac)
-    return gpu_options
+    #gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=frac)
+    #return gpu_options
 
 def restricted_float(x):
     """
